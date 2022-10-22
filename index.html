@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="masonry">
+  </div>
+  <script>
+    function randomIntFromInterval(min, max) { // min and max included
+      return Math.floor(Math.random() * (max - min + 1) + min)
+    }
+
+    const masonryContainer = document.querySelector('.masonry');
+
+    if (masonryContainer) {
+      for (let i = 1; i <= 1000; i++) {
+        const newNode = document.createElement('div');
+        const img = document.createElement('img');
+        img.setAttribute('data-src', `https://loremflickr.com/320/240?lock=${i}`);
+        newNode.classList.add('card');
+        newNode.classList.add('lazy');
+        newNode.style.height = `${randomIntFromInterval(200, 500)}px`;
+        newNode.innerHTML = i;
+        newNode.appendChild(img);
+        masonryContainer.appendChild(newNode);
+      }
+    }
+  </script>
+  <script src="masonry.js"></script>
+  <script>
+    function initLazy() {
+      setTimeout(() => {
+        const cards = Array.from(document.querySelectorAll('.lazy'));
+
+        if ('IntersectionObserver' in window) {
+          const cardObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+              const image = entry.target.querySelector('img');
+
+              if (entry.isIntersecting) {
+                image.src = image.dataset.src;
+              } else {
+                image.removeAttribute('src');
+              }
+            });
+          }, {
+            rootMargin: '500px'
+          });
+
+          cards.forEach(img => cardObserver.observe(img));
+        }
+      }, 300);
+    }
+
+    masonry.afterColumnsUpdate(() => {
+      initLazy();
+    });
+  </script>
+</body>
+</html>
